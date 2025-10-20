@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brasfoot 2025 Web Mobile</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <h1>Brasfoot 2025</h1>
+        <p>Bem-vindo ao seu Brasfoot Web Mobile personalizado!</p>
+        <button id="start-game">Iniciar Jogo</button>
+        <div id="team-selection" style="display: none;">
+            <h2>Selecione seu Time</h2>
+            <select id="player1-team"></select>
+            <select id="player2-team"></select>
+            <button id="confirm-teams">Confirmar Times</button>
+        </div>
+        <div id="match-screen" style="display: none;">
+            <h2>Partida</h2>
+            <p id="match-info"></p>
+            <button id="simulate-match">Simular Partida</button>
+            <p id="match-result"></p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
+
