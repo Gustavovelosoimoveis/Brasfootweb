@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brasfoot Web - Simulador Manager Completo</title>
+    <meta name="description" content="Simulador de futebol manager com dados reais - Dedicado ao Gustavo Rody Veloso">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0d4d2e">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #0d4d2e;
+            --secondary: #ffd700;
+            --dark: #0a1612;
+            --light: #ffffff;
+            --success: #00ff00;
+            --danger: #ff0000;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 100%);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: var(--secondary);
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+            animation: fadeIn 1s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+        
+        .card {
+            background: rgba(26, 95, 63, 0.9);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            margin: 15px 0;
+            background: #1e5c3f;
+            border: 2px solid var(--secondary);
+            border-radius: 10px;
+            color: var(--light);
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+            color: #000;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255,215,0,0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .hidden { display: none !important; }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.5em;
+            color: var(--secondary);
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        .info-box {
+            background: rgba(30, 92, 63, 0.8);
+            border-left: 4px solid var(--secondary);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .error-box {
+            background: rgba(139, 0, 0, 0.3);
+            border-left: 4px solid var(--danger);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        footer {
+            margin-top: 100px;
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(180deg, rgba(10,22,18,0) 0%, rgba(0,0,0,0.8) 100%);
+            border-top: 3px solid var(--secondary);
+        }
+        
+        .dedication {
+            background: rgba(255,215,0,0.1);
+            border: 2px solid var(--secondary);
+            border-radius: 15px;
+            padding: 40px;
+            margin: 30px auto;
+            max-width: 600px;
+        }
+        
+        .dedication-name {
+            color: var(--secondary);
+            font-size: 2.5em;
+            display: block;
+            margin: 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: glow 2s infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 10px rgba(255,215,0,0.5); }
+            50% { text-shadow: 0 0 20px rgba(255,215,0,0.8); }
+        }
+        
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            .btn { font-size: 1em; padding: 15px; }
+            .dedication-name { font-size: 1.8em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚽ BRASFOOT WEB</h1>
+        <p class="subtitle">Simulador Completo de Futebol Manager</p>
+        
+        <div id="app"></div>
+    </div>
+    
+    <footer>
+        <h2 style="color: var(--secondary); font-size: 2.5em; margin-bottom: 10px;">🎮 BRASFOOT WEB</h2>
+        <p style="color: #888; margin: 10px 0;">Versão 1.0 - Outubro 2025</p>
+        
+        <div class="dedication">
+            <p style="font-size: 1.2em; margin: 10px 0;">© 2025 Todos os direitos reservados</p>
+            <p style="font-size: 1.3em; margin: 20px 0;">
+                Desenvolvido com ❤️ por<br>
+                <strong style="color: var(--secondary); font-size: 1.5em;">Gustavo Veloso</strong>
+            </p>
+            <p style="font-style: italic; color: #bbb; margin: 20px 0;">
+                Dedicado especialmente ao
+            </p>
+            <span class="dedication-name">Gustavo Rody Veloso</span>
+            <p style="font-size: 1.2em; margin-top: 15px;">
+                Para criarmos memórias jogando juntos 🎮⚽
+            </p>
+        </div>
+        
+        <p style="color: #666; margin: 30px 0;">
+            Inspirado no clássico Brasfoot de Carlos Emmanuel dos Santos<br>
+            Powered by API-Football + ChatGPT + Firebase
+        </p>
+        <p style="color: #444; font-size: 0.9em;">Rio de Janeiro, Brasil 🇧🇷</p>
+    </footer>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <script src="config.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
