@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brasfoot 2025 Web Mobile</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <h1>Brasfoot 2025</h1>
+        <p>Bem-vindo ao seu Brasfoot Web Mobile personalizado!</p>
+        <button id="start-game">Iniciar Jogo</button>
+        <div id="team-selection" style="display: none;">
+            <h2>Selecione seu Time</h2>
+            <select id="player1-team"></select>
+            <select id="player2-team"></select>
+            <button id="confirm-teams">Confirmar Times</button>
+        </div>
+        <div id="match-screen" style="display: none;">
+            <h2>Partida</h2>
+            <p id="match-info"></p>
+            <button id="simulate-match">Simular Partida</button>
+            <p id="match-result"></p>
+            <!-- Botão para obter uma sugestão de escalação. Essa funcionalidade utiliza
+                 um algoritmo simples no frontend para sugerir os 11 jogadores (ou todos
+                 os disponíveis) do time selecionado. Para obter uma escalação realista
+                 via ChatGPT, use o script assistant_coach.py descrito no manual. -->
+            <button id="get-lineup" style="display: none;">Ver Sugestão de Escalação</button>
+            <p id="lineup-suggestion"></p>
+        </div>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
+
