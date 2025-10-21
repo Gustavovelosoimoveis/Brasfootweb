@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brasfoot 2025 - Jogo de Futebol</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0d4d2e 0%, #1a5f3f 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 2px solid #ffd700;
+        }
+
+        h1 {
+            color: #ffd700;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background: #ffd700;
+            color: #0d4d2e;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #ffed4e;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .screen {
+            display: none;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #ffd700;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .team-select {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .team-card {
+            background: rgba(26, 95, 63, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .team-card:hover {
+            background: rgba(26, 95, 63, 1);
+            border-color: #ffd700;
+        }
+
+        .team-card.selected {
+            background: #ffd700;
+            color: #0d4d2e;
+            border-color: #ffd700;
+        }
+
+        .match-result {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .score {
+            font-size: 3em;
+            color: #ffd700;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .players-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .player-item {
+            background: rgba(26, 95, 63, 0.8);
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 13px;
+            border-left: 3px solid #ffd700;
+        }
+
+        .player-item .name {
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .player-item .position {
+            font-size: 11px;
+            color: #ccc;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 215, 0, 0.3);
+            border-top: 4px solid #ffd700;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        .error {
+            background: #c00;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            color: #fff;
+        }
+
+        .info-box {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid #ffd700;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            color: #ffd700;
+        }
+
+        .position-group {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+        }
+
+        .position-group h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚽ BRASFOOT 2025 ⚽</h1>
+            <p>Jogo de Futebol com Elencos Completos</p>
+        </header>
+
+        <!-- Tela Inicial -->
+        <div id="home-screen" class="screen active">
+            <h2>Bem-vindo ao Brasfoot 2025!</h2>
+            <p style="margin: 20px 0;">Clique em "Começar Novo Jogo" para carregar os elencos completos (24 jogadores cada).</p>
+            <div class="info-box">
+                <strong>⚠️ Importante:</strong> Certifique-se de que sua chave OpenAI está configurada corretamente no arquivo.
+            </div>
+            <div class="button-group">
+                <button onclick="iniciarNovoJogo()">🎮 Começar Novo Jogo</button>
+            </div>
+        </div>
+
+        <!-- Tela de Carregamento -->
+        <div id="loading-screen" class="screen">
+            <div class="loading">
+                <p>Carregando elencos completos...</p>
+                <div class="spinner"></div>
+                <p id="loading-status">Buscando dados dos times...</p>
+            </div>
+        </div>
+
+        <!-- Tela de Seleção de Times -->
+        <div id="select-screen" class="screen">
+            <h2>Selecione Seu Time</h2>
+            <div id="teams-container" class="team-select"></div>
+            <div class="button-group">
+                <button onclick="confirmarSelecao()" id="btn-confirmar" disabled>Confirmar Seleção</button>
+                <button onclick="voltarHome()">Voltar</button>
+            </div>
+        </div>
+
+        <!-- Tela de Partida -->
+        <div id="match-screen" class="screen">
+            <h2>Simulação de Partida</h2>
+            <div id="match-info" style="font-size: 1.2em; margin: 20px 0;"></div>
+            <div class="button-group">
+                <button onclick="simularPartida()">⚽ Simular Partida</button>
+                <button onclick="verElenco()">👥 Ver Elenco (24 jogadores)</button>
+                <button onclick="voltarHome()">Voltar</button>
+            </div>
+            <div id="match-result"></div>
+        </div>
+
+        <!-- Tela de Elenco -->
+        <div id="squad-screen" class="screen">
+            <h2>Elenco Completo do Time</h2>
+            <div id="squad-info"></div>
+            <div id="squad-players"></div>
+            <div class="button-group">
+                <button onclick="voltarMatch()">Voltar</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 Todos os direitos reservados</p>
+        <p>Desenvolvido com ❤️ por</p>
+        <p><strong>Gustavo Veloso</strong></p>
+        <p>Dedicado especialmente ao meu filho</p>
+        <p><strong>Gustavo Rody Veloso</strong></p>
+        <p>Para criarmos memórias jogando juntos 🎮⚽</p>
+    </footer>
+
+    <script>
+        // ⚠️ CONFIGURE AQUI SUA CHAVE OPENAI
+        const OPENAI_API_KEY = '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';
+
+        // Dados do jogo
+        let jogo = {
+            times: [],
+            timeAtual: null,
+            adversario: null,
+            campeonatos: [
+                'Flamengo',
+                'Palmeiras',
+                'Botafogo',
+                'Fluminense',
+                'Corinthians',
+                'São Paulo',
+                'Internacional',
+                'Grêmio',
+                'Atlético-MG',
+                'Cruzeiro',
+                'Santos',
+                'Vasco',
+                'Bahia',
+                'Fortaleza',
+                'Athletico-PR',
+                'Red Bull Bragantino',
+                'Vitória',
+                'Juventude',
+                'Manchester United',
+                'Liverpool',
+                'Manchester City',
+                'Arsenal',
+                'Chelsea',
+                'Real Madrid',
+                'Barcelona',
+                'Atlético Madrid',
+                'Bayern Munich',
+                'Borussia Dortmund',
+                'Paris Saint-Germain',
+                'Marseille',
+                'Juventus',
+                'AC Milan'
+            ]
+        };
+
+        // Estrutura de posições
+        const POSICOES = {
+            goleiros: { label: 'Goleiros', count: 2 },
+            zagueiros: { label: 'Zagueiros', count: 5 },
+            lateraisD: { label: 'Laterais Direita', count: 2 },
+            lateraisE: { label: 'Laterais Esquerda', count: 2 },
+            meias: { label: 'Meias (Volantes, Meia, Meia Atacante)', count: 8 },
+            atacantes: { label: 'Atacantes (Pontas e Centro Avante)', count: 3 }
+        };
+
+        // Funções de UI
+        function mostrarTela(telaId) {
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            document.getElementById(telaId).classList.add('active');
+        }
+
+        function voltarHome() {
+            mostrarTela('home-screen');
+        }
+
+        function voltarMatch() {
+            mostrarTela('match-screen');
+        }
+
+        // Iniciar novo jogo
+        async function iniciarNovoJogo() {
+            mostrarTela('loading-screen');
+            try {
+                await carregarTimes();
+                renderizarTimes();
+                mostrarTela('select-screen');
+            } catch (error) {
+                mostrarErro('Erro ao carregar times: ' + error.message);
+                voltarHome();
+            }
+        }
+
+        // Carregar times e seus elencos via OpenAI
+        async function carregarTimes() {
+            jogo.times = [];
+            
+            for (let i = 0; i < jogo.campeonatos.length; i++) {
+                const nomeTime = jogo.campeonatos[i];
+                
+                try {
+                    document.getElementById('loading-status').textContent = 
+                        `Carregando elenco de ${nomeTime}... (${i + 1}/${jogo.campeonatos.length})`;
+                    
+                    const jogadores = await gerarElencoComGPT(nomeTime);
+                    
+                    jogo.times.push({
+                        id: i,
+                        nome: nomeTime,
+                        jogadores: jogadores,
+                        overall: 75 + Math.floor(Math.random() * 20)
+                    });
+
+                    // Pequeno delay para não sobrecarregar a API
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                } catch (error) {
+                    console.warn(`Erro ao carregar ${nomeTime}:`, error);
+                    // Usar elenco padrão se falhar
+                    jogo.times.push({
+                        id: i,
+                        nome: nomeTime,
+                        jogadores: gerarElencoParadrao(),
+                        overall: 75 + Math.floor(Math.random() * 20)
+                    });
+                }
+            }
+
+            if (jogo.times.length === 0) {
+                throw new Error('Nenhum time foi carregado');
+            }
+        }
+
+        // Gerar elenco completo com 24 jogadores e posições
+        async function gerarElencoComGPT(nomeTime) {
+            try {
+                const prompt = `Você é um especialista em futebol. Gere um elenco COMPLETO de 24 jogadores do time ${nomeTime} com suas posições.
+
+ESTRUTURA OBRIGATÓRIA:
+- 2 Goleiros
+- 5 Zagueiros
+- 2 Laterais Direita
+- 2 Laterais Esquerda
+- 8 Meias (volantes, meias, meia atacante)
+- 3 Atacantes (pontas e centro avante)
+
+Responda EXATAMENTE neste formato (sem numeração, sem explicações):
+
+GOLEIROS: Nome1, Nome2
+ZAGUEIROS: Nome1, Nome2, Nome3, Nome4, Nome5
+LATERAIS DIREITA: Nome1, Nome2
+LATERAIS ESQUERDA: Nome1, Nome2
+MEIAS: Nome1, Nome2, Nome3, Nome4, Nome5, Nome6, Nome7, Nome8
+ATACANTES: Nome1, Nome2, Nome3`;
+
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${OPENAI_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: [{ role: 'user', content: prompt }],
+                        max_tokens: 300,
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Erro na API: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const resposta = data.choices[0].message.content;
+                
+                return parseElenco(resposta);
+            } catch (error) {
+                console.warn(`Erro ao gerar elenco para ${nomeTime}:`, error);
+                return gerarElencoParadrao();
+            }
+        }
+
+        // Parser do elenco
+        function parseElenco(texto) {
+            const elenco = [];
+            const linhas = texto.split('\n');
+
+            const posicoes = {
+                'GOLEIROS': 'Goleiro',
+                'ZAGUEIROS': 'Zagueiro',
+                'LATERAIS DIREITA': 'Lateral Direita',
+                'LATERAIS ESQUERDA': 'Lateral Esquerda',
+                'MEIAS': 'Meia',
+                'ATACANTES': 'Atacante'
+            };
+
+            for (const linha of linhas) {
+                for (const [chave, posicao] of Object.entries(posicoes)) {
+                    if (linha.includes(chave)) {
+                        const nomes = linha.replace(chave + ':', '').split(',').map(n => n.trim()).filter(n => n);
+                        for (const nome of nomes) {
+                            if (nome.length > 0) {
+                                elenco.push({
+                                    nome: nome,
+                                    posicao: posicao
+                                });
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // Se não conseguiu parsear, gera padrão
+            if (elenco.length < 24) {
+                return gerarElencoParadrao();
+            }
+
+            return elenco.slice(0, 24);
+        }
+
+        // Elenco padrão (fallback)
+        function gerarElencoParadrao() {
+            const elenco = [];
+            
+            const goleiros = ['Goleiro 1', 'Goleiro 2'];
+            const zagueiros = ['Zagueiro 1', 'Zagueiro 2', 'Zagueiro 3', 'Zagueiro 4', 'Zagueiro 5'];
+            const lateraisD = ['Lateral D 1', 'Lateral D 2'];
+            const lateraisE = ['Lateral E 1', 'Lateral E 2'];
+            const meias = ['Volante 1', 'Volante 2', 'Meia 1', 'Meia 2', 'Meia Direita', 'Meia Esquerda', 'Meia Atacante 1', 'Meia Atacante 2'];
+            const atacantes = ['Ponta Direita', 'Ponta Esquerda', 'Centro Avante'];
+
+            goleiros.forEach(g => elenco.push({ nome: g, posicao: 'Goleiro' }));
+            zagueiros.forEach(z => elenco.push({ nome: z, posicao: 'Zagueiro' }));
+            lateraisD.forEach(l => elenco.push({ nome: l, posicao: 'Lateral Direita' }));
+            lateraisE.forEach(l => elenco.push({ nome: l, posicao: 'Lateral Esquerda' }));
+            meias.forEach(m => elenco.push({ nome: m, posicao: 'Meia' }));
+            atacantes.forEach(a => elenco.push({ nome: a, posicao: 'Atacante' }));
+
+            return elenco;
+        }
+
+        // Confirmar seleção de time
+        async function confirmarSelecao() {
+            const selecionado = document.querySelector('.team-card.selected');
+            if (!selecionado) {
+                mostrarErro('Selecione um time!');
+                return;
+            }
+
+            const timeId = parseInt(selecionado.dataset.id);
+            jogo.timeAtual = jogo.times.find(t => t.id === timeId);
+
+            mostrarTela('match-screen');
+            atualizarInfoPartida();
+        }
+
+        // Renderizar times
+        function renderizarTimes() {
+            const container = document.getElementById('teams-container');
+            container.innerHTML = '';
+
+            jogo.times.forEach(time => {
+                const card = document.createElement('div');
+                card.className = 'team-card';
+                card.dataset.id = time.id;
+                card.innerHTML = `
+                    <div><strong>${time.nome}</strong></div>
+                    <div style="font-size: 12px;">Overall: ${time.overall}</div>
+                    <div style="font-size: 12px;">${time.jogadores.length} jogadores</div>
+                `;
+                card.onclick = () => selecionarTime(card);
+                container.appendChild(card);
+            });
+        }
+
+        function selecionarTime(card) {
+            document.querySelectorAll('.team-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            document.getElementById('btn-confirmar').disabled = false;
+        }
+
+        // Atualizar info da partida
+        function atualizarInfoPartida() {
+            const adversarios = jogo.times.filter(t => t.id !== jogo.timeAtual.id);
+            jogo.adversario = adversarios[Math.floor(Math.random() * adversarios.length)];
+
+            document.getElementById('match-info').innerHTML = `
+                <div style="font-size: 1.5em; margin: 20px 0;">
+                    <strong>${jogo.timeAtual.nome}</strong> vs <strong>${jogo.adversario.nome}</strong>
+                </div>
+            `;
+        }
+
+        // Ver elenco completo
+        function verElenco() {
+            const squadInfo = document.getElementById('squad-info');
+            const squadPlayers = document.getElementById('squad-players');
+
+            squadInfo.innerHTML = `<h3>${jogo.timeAtual.nome}</h3><p>Overall: ${jogo.timeAtual.overall} | Total: ${jogo.timeAtual.jogadores.length} jogadores</p>`;
+            squadPlayers.innerHTML = '';
+
+            // Agrupar por posição
+            const porPosicao = {};
+            jogo.timeAtual.jogadores.forEach(jogador => {
+                if (!porPosicao[jogador.posicao]) {
+                    porPosicao[jogador.posicao] = [];
+                }
+                porPosicao[jogador.posicao].push(jogador);
+            });
+
+            // Ordem das posições
+            const ordem = ['Goleiro', 'Zagueiro', 'Lateral Direita', 'Lateral Esquerda', 'Meia', 'Atacante'];
+
+            for (const posicao of ordem) {
+                if (porPosicao[posicao]) {
+                    const grupo = document.createElement('div');
+                    grupo.className = 'position-group';
+                    grupo.innerHTML = `<h4>${posicao}</h4>`;
+
+                    const playersList = document.createElement('div');
+                    playersList.className = 'players-list';
+
+                    porPosicao[posicao].forEach(jogador => {
+                        const playerDiv = document.createElement('div');
+                        playerDiv.className = 'player-item';
+                        playerDiv.innerHTML = `
+                            <div class="name">${jogador.nome}</div>
+                            <div class="position">${jogador.posicao}</div>
+                        `;
+                        playersList.appendChild(playerDiv);
+                    });
+
+                    grupo.appendChild(playersList);
+                    squadPlayers.appendChild(grupo);
+                }
+            }
+
+            mostrarTela('squad-screen');
+        }
+
+        // Simular partida
+        async function simularPartida() {
+            const resultDiv = document.getElementById('match-result');
+            resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Simulando partida...</p></div>';
+
+            try {
+                // Gerar placar realista
+                const placar = gerarPlacarRealista();
+
+                // Otimizar resultado com GPT
+                const analise = await otimizarComGPT(placar);
+
+                // Exibir resultado
+                resultDiv.innerHTML = `
+                    <div class="match-result">
+                        <h3>Resultado Final</h3>
+                        <div class="score">${placar.time1} - ${placar.time2}</div>
+                        <p><strong>${jogo.timeAtual.nome}</strong> ${placar.time1}</p>
+                        <p><strong>${jogo.adversario.nome}</strong> ${placar.time2}</p>
+                        <p style="margin-top: 20px; font-size: 14px; color: #ffd700;">${analise}</p>
+                        <div class="button-group" style="margin-top: 20px;">
+                            <button onclick="simularPartida()">⚽ Jogar Novamente</button>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Erro na simulação: ${error.message}</div>`;
+            }
+        }
+
+        // Gerar placar realista
+        function gerarPlacarRealista() {
+            const probabilidades = [
+                { time1: 0, time2: 0, chance: 0.05 },
+                { time1: 1, time2: 0, chance: 0.15 },
+                { time1: 0, time2: 1, chance: 0.15 },
+                { time1: 1, time2: 1, chance: 0.20 },
+                { time1: 2, time2: 0, chance: 0.12 },
+                { time1: 0, time2: 2, chance: 0.12 },
+                { time1: 2, time2: 1, chance: 0.10 },
+                { time1: 1, time2: 2, chance: 0.10 },
+                { time1: 2, time2: 2, chance: 0.01 }
+            ];
+
+            let random = Math.random();
+            let acumulado = 0;
+
+            for (const prob of probabilidades) {
+                acumulado += prob.chance;
+                if (random <= acumulado) {
+                    return { time1: prob.time1, time2: prob.time2 };
+                }
+            }
+
+            return { time1: 1, time2: 1 };
+        }
+
+        // Otimizar resultado com GPT
+        async function otimizarComGPT(placar) {
+            try {
+                const prompt = `Analise este resultado de futebol:
+${jogo.timeAtual.nome} ${placar.time1} x ${placar.time2} ${jogo.adversario.nome}
+
+Gere uma análise BREVE (máximo 2 linhas) sobre o que pode ter acontecido em campo. Seja realista e técnico.`;
+
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${OPENAI_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: [{ role: 'user', content: prompt }],
+                        max_tokens: 100,
+                        temperature: 0.7
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.choices[0].message.content;
+                }
+            } catch (error) {
+                console.warn('Erro ao chamar GPT:', error);
+            }
+
+            return 'Partida realizada com sucesso!';
+        }
+
+        // Mostrar erro
+        function mostrarErro(mensagem) {
+            const container = document.querySelector('.container');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = mensagem;
+            container.insertBefore(errorDiv, container.firstChild);
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Brasfoot 2025 carregado!');
+            if (OPENAI_API_KEY.includes('SEU_OPENAI_KEY')) {
+                mostrarErro('⚠️ Configure sua chave OpenAI no arquivo index.html!');
+            }
+        });
+    </script>
+</body>
+</html>
