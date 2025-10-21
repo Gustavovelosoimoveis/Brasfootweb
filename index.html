@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brasfoot 2025 - Jogo de Futebol</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0d4d2e 0%, #1a5f3f 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 2px solid #ffd700;
+        }
+
+        h1 {
+            color: #ffd700;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background: #ffd700;
+            color: #0d4d2e;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #ffed4e;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .screen {
+            display: none;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #ffd700;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .team-select {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .team-card {
+            background: rgba(26, 95, 63, 0.8);
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .team-card:hover {
+            background: rgba(26, 95, 63, 1);
+            border-color: #ffd700;
+        }
+
+        .team-card.selected {
+            background: #ffd700;
+            color: #0d4d2e;
+            border-color: #ffd700;
+        }
+
+        .match-result {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .score {
+            font-size: 3em;
+            color: #ffd700;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .players-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .player-item {
+            background: rgba(26, 95, 63, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 215, 0, 0.3);
+            border-top: 4px solid #ffd700;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+
+        .error {
+            background: #c00;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            color: #fff;
+        }
+
+        .success {
+            background: #0a0;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚽ BRASFOOT 2025 ⚽</h1>
+            <p>Jogo de Futebol com Dados Reais</p>
+        </header>
+
+        <!-- Tela Inicial -->
+        <div id="home-screen" class="screen active">
+            <h2>Bem-vindo ao Brasfoot 2025!</h2>
+            <p style="margin: 20px 0;">Comece um novo jogo para carregar os elencos atuais de todos os times.</p>
+            <div class="button-group">
+                <button onclick="iniciarNovoJogo()">🎮 Começar Novo Jogo</button>
+            </div>
+        </div>
+
+        <!-- Tela de Carregamento -->
+        <div id="loading-screen" class="screen">
+            <div class="loading">
+                <p>Carregando elencos atuais...</p>
+                <div class="spinner"></div>
+                <p id="loading-status">Buscando dados dos times...</p>
+            </div>
+        </div>
+
+        <!-- Tela de Seleção de Times -->
+        <div id="select-screen" class="screen">
+            <h2>Selecione Seu Time</h2>
+            <div id="teams-container" class="team-select"></div>
+            <div class="button-group">
+                <button onclick="confirmarSelecao()" id="btn-confirmar" disabled>Confirmar Seleção</button>
+                <button onclick="voltarHome()">Voltar</button>
+            </div>
+        </div>
+
+        <!-- Tela de Partida -->
+        <div id="match-screen" class="screen">
+            <h2>Simulação de Partida</h2>
+            <div id="match-info" style="font-size: 1.2em; margin: 20px 0;"></div>
+            <div class="button-group">
+                <button onclick="simularPartida()">⚽ Simular Partida</button>
+                <button onclick="voltarHome()">Voltar</button>
+            </div>
+            <div id="match-result"></div>
+        </div>
+
+        <!-- Tela de Elenco -->
+        <div id="squad-screen" class="screen">
+            <h2>Elenco do Time</h2>
+            <div id="squad-info"></div>
+            <div id="squad-players" class="players-list"></div>
+            <div class="button-group">
+                <button onclick="voltarHome()">Voltar</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 Todos os direitos reservados</p>
+        <p>Desenvolvido com ❤️ por</p>
+        <p><strong>Gustavo Veloso</strong></p>
+        <p>Dedicado especialmente ao meu filho</p>
+        <p><strong>Gustavo Rody Veloso</strong></p>
+        <p>Para criarmos memórias jogando juntos 🎮⚽</p>
+    </footer>
+
+    <script>
+        // Configuração
+        const API_FOOTBALL_KEY = 'd64827493abf643aa1144e2629691901';
+        const OPENAI_API_KEY = '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';
+
+        // Dados do jogo
+        let jogo = {
+            times: [],
+            timeAtual: null,
+            adversario: null,
+            campeonatos: [
+                { id: 71, nome: 'Brasileirão Série A', pais: 'Brasil' },
+                { id: 72, nome: 'Brasileirão Série B', pais: 'Brasil' },
+                { id: 39, nome: 'Premier League', pais: 'Inglaterra' },
+                { id: 140, nome: 'La Liga', pais: 'Espanha' },
+                { id: 78, nome: 'Bundesliga', pais: 'Alemanha' },
+                { id: 135, nome: 'Serie A', pais: 'Itália' },
+                { id: 61, nome: 'Ligue 1', pais: 'França' }
+            ]
+        };
+
+        // Funções de UI
+        function mostrarTela(telaId) {
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            document.getElementById(telaId).classList.add('active');
+        }
+
+        function voltarHome() {
+            mostrarTela('home-screen');
+        }
+
+        // Iniciar novo jogo
+        async function iniciarNovoJogo() {
+            mostrarTela('loading-screen');
+            try {
+                await carregarTimes();
+                mostrarTela('select-screen');
+            } catch (error) {
+                mostrarErro('Erro ao carregar times: ' + error.message);
+                voltarHome();
+            }
+        }
+
+        // Carregar times de múltiplos campeonatos
+        async function carregarTimes() {
+            jogo.times = [];
+            
+            for (const campeonato of jogo.campeonatos) {
+                try {
+                    document.getElementById('loading-status').textContent = 
+                        `Carregando ${campeonato.nome}...`;
+                    
+                    const response = await fetch(
+                        `https://v3.football.api-sports.io/standings?league=${campeonato.id}&season=2024`,
+                        {
+                            headers: {
+                                'x-rapidapi-key': API_FOOTBALL_KEY,
+                                'x-rapidapi-host': 'v3.football.api-sports.io'
+                            }
+                        }
+                    );
+
+                    if (!response.ok) continue;
+
+                    const data = await response.json();
+                    
+                    if (data.response && data.response[0] && data.response[0].standings) {
+                        const standings = data.response[0].standings[0];
+                        
+                        for (const time of standings) {
+                            jogo.times.push({
+                                id: time.team.id,
+                                nome: time.team.name,
+                                logo: time.team.logo,
+                                campeonato: campeonato.nome,
+                                pontos: time.points,
+                                jogadores: []
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.warn(`Erro ao carregar ${campeonato.nome}:`, error);
+                }
+            }
+
+            if (jogo.times.length === 0) {
+                throw new Error('Nenhum time foi carregado');
+            }
+        }
+
+        // Confirmar seleção de time
+        async function confirmarSelecao() {
+            const selecionado = document.querySelector('.team-card.selected');
+            if (!selecionado) {
+                mostrarErro('Selecione um time!');
+                return;
+            }
+
+            const timeId = parseInt(selecionado.dataset.id);
+            jogo.timeAtual = jogo.times.find(t => t.id === timeId);
+
+            mostrarTela('match-screen');
+            atualizarInfoPartida();
+        }
+
+        // Renderizar times
+        function renderizarTimes() {
+            const container = document.getElementById('teams-container');
+            container.innerHTML = '';
+
+            jogo.times.forEach(time => {
+                const card = document.createElement('div');
+                card.className = 'team-card';
+                card.dataset.id = time.id;
+                card.innerHTML = `
+                    <img src="${time.logo}" style="width: 50px; height: 50px; margin-bottom: 10px;">
+                    <div><strong>${time.nome}</strong></div>
+                    <div style="font-size: 12px;">${time.campeonato}</div>
+                    <div style="font-size: 12px;">Pontos: ${time.pontos}</div>
+                `;
+                card.onclick = () => selecionarTime(card);
+                container.appendChild(card);
+            });
+        }
+
+        function selecionarTime(card) {
+            document.querySelectorAll('.team-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            document.getElementById('btn-confirmar').disabled = false;
+        }
+
+        // Atualizar info da partida
+        function atualizarInfoPartida() {
+            const adversarios = jogo.times.filter(t => t.id !== jogo.timeAtual.id);
+            jogo.adversario = adversarios[Math.floor(Math.random() * adversarios.length)];
+
+            document.getElementById('match-info').innerHTML = `
+                <div style="font-size: 1.5em; margin: 20px 0;">
+                    <strong>${jogo.timeAtual.nome}</strong> vs <strong>${jogo.adversario.nome}</strong>
+                </div>
+            `;
+        }
+
+        // Simular partida
+        async function simularPartida() {
+            const resultDiv = document.getElementById('match-result');
+            resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p>Simulando partida...</p></div>';
+
+            try {
+                // Gerar placar realista
+                const placar = gerarPlacarRealista();
+
+                // Otimizar resultado com GPT (opcional)
+                const analise = await otimizarComGPT(placar);
+
+                // Exibir resultado
+                resultDiv.innerHTML = `
+                    <div class="match-result">
+                        <h3>Resultado Final</h3>
+                        <div class="score">${placar.time1} - ${placar.time2}</div>
+                        <p><strong>${jogo.timeAtual.nome}</strong> ${placar.time1}</p>
+                        <p><strong>${jogo.adversario.nome}</strong> ${placar.time2}</p>
+                        <p style="margin-top: 20px; font-size: 14px;">${analise}</p>
+                        <div class="button-group" style="margin-top: 20px;">
+                            <button onclick="simularPartida()">⚽ Jogar Novamente</button>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Erro na simulação: ${error.message}</div>`;
+            }
+        }
+
+        // Gerar placar realista
+        function gerarPlacarRealista() {
+            // Placar baseado em probabilidades reais de futebol
+            const probabilidades = [
+                { time1: 0, time2: 0, chance: 0.05 },
+                { time1: 1, time2: 0, chance: 0.15 },
+                { time1: 0, time2: 1, chance: 0.15 },
+                { time1: 1, time2: 1, chance: 0.20 },
+                { time1: 2, time2: 0, chance: 0.12 },
+                { time1: 0, time2: 2, chance: 0.12 },
+                { time1: 2, time2: 1, chance: 0.10 },
+                { time1: 1, time2: 2, chance: 0.10 },
+                { time1: 2, time2: 2, chance: 0.01 }
+            ];
+
+            let random = Math.random();
+            let acumulado = 0;
+
+            for (const prob of probabilidades) {
+                acumulado += prob.chance;
+                if (random <= acumulado) {
+                    return { time1: prob.time1, time2: prob.time2 };
+                }
+            }
+
+            return { time1: 1, time2: 1 };
+        }
+
+        // Otimizar resultado com GPT
+        async function otimizarComGPT(placar) {
+            try {
+                const prompt = `Você é um analista de futebol. Baseado neste resultado:
+${jogo.timeAtual.nome} ${placar.time1} x ${placar.time2} ${jogo.adversario.nome}
+
+Gere uma análise breve (máximo 2 linhas) sobre o que pode ter acontecido em campo. Seja realista e técnico.`;
+
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${OPENAI_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-3.5-turbo',
+                        messages: [{ role: 'user', content: prompt }],
+                        max_tokens: 100
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.choices[0].message.content;
+                }
+            } catch (error) {
+                console.warn('Erro ao chamar GPT:', error);
+            }
+
+            return 'Partida realizada com sucesso!';
+        }
+
+        // Mostrar erro
+        function mostrarErro(mensagem) {
+            const container = document.querySelector('.container');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = mensagem;
+            container.insertBefore(errorDiv, container.firstChild);
+            setTimeout(() => errorDiv.remove(), 5000);
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Brasfoot 2025 carregado!');
+        });
+    </script>
+</body>
+</html>
